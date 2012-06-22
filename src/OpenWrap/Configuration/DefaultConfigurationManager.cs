@@ -74,7 +74,8 @@ namespace OpenWrap.Configuration
                         commitKey();
                         yield return commitVal();
                     }
-                    else if (state == VALUE) yield return commitVal();
+                    else if (state == VALUE || state == BEFORE_VAL)
+                        yield return commitVal();
                 }
                 else if (curChar == '\\')
                 {
@@ -102,6 +103,7 @@ namespace OpenWrap.Configuration
                     append();
                 }
             }
+
             if (sb.Length > 0 && key == null)
                 key = sb.ToString();
             else if (sb.Length > 0)
@@ -142,10 +144,10 @@ namespace OpenWrap.Configuration
         static object AssignPropertiesFromLines(object instance, IEnumerable<ConfigurationLine> lines)
         {
             var type = instance.GetType();
-            var propertiesWithKeys = (type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+            var propertiesWithKeys = type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
                 .Select(prop => new { prop, attr = prop.Attribute<KeyAttribute>() })
                 .Where(@t => t.attr != null)
-                .ToLookup(x => x.attr.Name, x => x.prop, StringComparer.OrdinalIgnoreCase));
+                .ToLookup(x => x.attr.Name, x => x.prop, StringComparer.OrdinalIgnoreCase);
 
             foreach (var linesByName in lines.GroupBy(x => x.Name, StringComparer.OrdinalIgnoreCase))
             {
@@ -166,14 +168,17 @@ namespace OpenWrap.Configuration
                 {
                     propertyValue = AssignPropertyFromLine(property.PropertyType, linesByName.Last().Value, property.Attribute<EncryptAttribute>() != null);
                 }
+
                 property.SetValue(instance, propertyValue, null);
             }
+
             return instance;
         }
 
         static object AssignPropertyFromLine(Type targetType, string value, bool encrypted)
         {
             object propertyValue;
+            value = value.DecodeBreaks();
 
             var keyValues = ParseKeyValuePairs(value);
 
@@ -204,10 +209,16 @@ namespace OpenWrap.Configuration
             {
                 propertyValue = Activator.CreateInstance(targetType);
             }
+
             if (targetType.IsPrimitive == false && properties.Any())
-                propertyValue = AssignPropertiesFromLines(propertyValue,
-                                                          properties.Select(x =>
-                                                                            new ConfigurationLine { Name = x.Key, Value = new StringBuilder().AppendQuoted(x.Value).ToString() }));
+                propertyValue = AssignPropertiesFromLines(propertyValue, 
+                                                          properties
+                                                              .Where(_ => _.Value != null)
+                                                              .Select(x => new ConfigurationLine
+                                                              {
+                                                                  Name = x.Key, 
+                                                                  Value = new StringBuilder().AppendQuoted(x.Value).ToString()
+                                                              }));
             return propertyValue;
         }
 
@@ -252,7 +263,6 @@ namespace OpenWrap.Configuration
                     // ReSharper disable AssignNullToNotNullAttribute
                     return (T)fi.GetValue(null);
             // ReSharper restore AssignNullToNotNullAttribute
-
             return (T)pi.GetValue(null, null);
         }
 
@@ -283,10 +293,10 @@ namespace OpenWrap.Configuration
                 {
                     if (e.InnerException is ArgumentException)
                         throw new InvalidConfigurationException(
-                            String.Format("Duplicate configuration section of type '{0}' with name '{1} in the file '{2}' found. Correct the issue and retry.",
-                                          section.Type,
-                                          section.Name,
-                                          file.Path.FullPath),
+                            string.Format("Duplicate configuration section of type '{0}' with name '{1} in the file '{2}' found. Correct the issue and retry.", 
+                                          section.Type, 
+                                          section.Name, 
+                                          file.Path.FullPath), 
                             e.InnerException);
                     throw e.InnerException;
                 }
@@ -305,9 +315,7 @@ namespace OpenWrap.Configuration
 
         static T ReadFile<T>(IFile file) where T : new()
         {
-            string data;
-            using (var fileStream = file.OpenRead())
-                data = Encoding.UTF8.GetString(fileStream.ReadToEnd());
+            string data = file.ReadRetry(stream => stream.ReadString());
 
             var parsedConfig = new ConfigurationParser().Parse(data);
             var configData = new T();
@@ -317,6 +325,7 @@ namespace OpenWrap.Configuration
             {
                 PopulateDictionaryEntries(file, dictionaryInterface, parsedConfig, configData);
             }
+
             AssignPropertiesFromLines(configData, parsedConfig.OfType<ConfigurationLine>());
             return configData;
         }
@@ -364,12 +373,12 @@ namespace OpenWrap.Configuration
         {
             var builder = new StringBuilder();
             if (value.ToString() != value.GetType().ToString())
-                builder.AppendQuoted(value.ToString());
-            WriteProperties(value,
-                            (key, val) => builder.Append(builder.Length > 0 ? "; " : String.Empty)
+                builder.AppendQuoted(value.ToString().EncodeBreaks());
+            WriteProperties(value, 
+                            (key, val) => builder.Append(builder.Length > 0 ? "; " : string.Empty)
                                               .AppendQuoted(key)
                                               .Append("=")
-                                              .Append(val));
+                                              .Append(val.EncodeBreaks()));
 
             return encryptAttrib != null
                        ? new StringBuilder().AppendQuoted(
@@ -386,7 +395,7 @@ namespace OpenWrap.Configuration
 
         IFile GetConfigurationFile(Uri uri)
         {
-            return ConfigurationDirectory.GetFile(ConstantUris.Base.MakeRelativeUri(uri).ToString());
+            return ConfigurationDirectory.GetFile(uri.IsAbsoluteUri ? ConstantUris.Base.MakeRelativeUri(uri).ToString() : uri.ToString());
         }
     }
 }

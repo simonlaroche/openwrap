@@ -10,7 +10,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Tests</RootNamespace>
-    <AssemblyName>OpenWrap.Tests</AssemblyName>
+    <AssemblyName>Tests</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
@@ -100,6 +100,7 @@
     <Compile Include="Commands\build_wrap\version\from_version_file.cs" />
     <Compile Include="Commands\build_wrap\version\none.cs" />
     <Compile Include="Commands\clean_wrap\locks\existing_lock.cs" />
+    <Compile Include="Commands\command_line_runner\system_wide_optional_inputs_and_empty_positioned.cs" />
     <Compile Include="Commands\contexts\build_wrap.cs" />
     <Compile Include="Commands\build_wrap\no_descriptor.cs" />
     <Compile Include="Commands\build_wrap\from_path\path_does_not_exist.cs" />
@@ -246,6 +247,13 @@
     <Compile Include="Repositories\indexed_http\reading_the_dynamicproxy_package.cs" />
     <Compile Include="Repositories\indexed_http\wrap_list.cs" />
     <Compile Include="Repositories\maven_style_version_definition.cs" />
+    <Compile Include="Repositories\nufeed\cached\initial_retrieval.cs" />
+    <Compile Include="Repositories\nufeed\cached\parallel\initial_retrieval.cs" />
+    <Compile Include="Repositories\nufeed\cached\parallel\updating_appends_pacakge.cs" />
+    <Compile Include="Repositories\nufeed\cached\updates_available.cs" />
+    <Compile Include="Repositories\nufeed\parser\invalid_dependency.cs" />
+    <Compile Include="Repositories\nufeed\parser\invalid_package_name.cs" />
+    <Compile Include="Repositories\nufeed\parser\nuget_pre_version.cs" />
     <Compile Include="Repositories\nuspec.cs" />
     <Compile Include="Repositories\when_nuking_a_package.cs" />
     <Compile Include="RepositoryAssertions.cs" />
@@ -571,8 +579,7 @@
     <Compile Include="Repositories\manager\repositories_by_user_input.cs" />
     <Compile Include="Repositories\manager\repositories_with_authentication.cs" />
     <Compile Include="Repositories\manager\repositories_with_authentication_without_auth_support.cs" />
-    <Compile Include="Repositories\nufeed\reading_official_nuget_feed2.cs" />
-    <Compile Include="Repositories\nufeed\reading_package_feeds.cs" />
+    <Compile Include="Repositories\nufeed\multiple_pages.cs" />
     <Compile Include="Repositories\contexts\nufeed_parser.cs" />
     <Compile Include="Repositories\nufeed\parser\reading_base_uri.cs" />
     <Compile Include="Repositories\nufeed\parser\reading_empty_dependencies.cs" />
@@ -594,6 +601,8 @@
     <Compile Include="resolving_dependency_trees\resolving_namespaced_dependency.cs" />
     <Compile Include="string_conversions.cs" />
     <Compile Include="Testing\finding_runner\runner_in_referenced_package_is_found.cs" />
+    <Compile Include="TimeExtensions.cs" />
+    <Compile Include="UriExtensions.cs" />
     <Compile Include="version\generation\flat_version.cs" />
     <Compile Include="version\generation\incremental_version.cs" />
     <Compile Include="version\generation\timestamp_version.cs" />

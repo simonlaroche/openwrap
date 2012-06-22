@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq.Expressions;
 using System.Text;
+using System.Xml.Linq;
 using OpenRasta.Client;
 using OpenRasta.Client.Memory;
 using OpenWrap.Testing;
@@ -13,6 +14,11 @@ namespace Tests.contexts
     {
         protected MemoryHttpClient Client = new MemoryHttpClient();
 
+        protected void given_remote_resource(string uri, string mediaType, XDocument content, string username = null, string password = null)
+        {
+            given_remote_resource(uri, mediaType, content.ToString(), username, password);
+
+        }
         protected void given_remote_resource(string uri, string mediaType, string content, string username = null, string password = null)
         {
             Client.Resources[uri.ToUri()] = new MemoryResource(new MediaType(mediaType), new MemoryStream(Encoding.UTF8.GetBytes(content)))
@@ -36,6 +42,18 @@ namespace Tests.contexts
                     {
                         { handler.Parameters[0].Name, handler.Compile() }
                     }
+            };
+        }
+
+        protected void given_not_found_response(Func<IClientRequest, bool> predicate, XDocument feed)
+        {
+            var existingResponse = Client.NotFoundResponse;
+            Client.NotFoundResponse = request => !predicate(request)
+                ? existingResponse(request) 
+                : new MemoryResponse(200)
+            {
+                Entity = new MemoryEntity(new MediaType("application/atom+xml"), 
+                    new MemoryStream(Encoding.UTF8.GetBytes(feed.ToString())))
             };
         }
     }
