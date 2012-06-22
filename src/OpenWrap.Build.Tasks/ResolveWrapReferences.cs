@@ -135,7 +135,7 @@ namespace OpenWrap.Build.Tasks
                     Log.LogMessage("Ignoring OpenWrap reference to '{0}'", assemblyRef.File.Path.FullPath);
                     continue;
                 }
-                if (InputReferences.Any(x=>string.Equals(x.ItemSpec, assemblyRef.AssemblyName.Name, StringComparison.OrdinalIgnoreCase)))
+                if (InputReferences != null && InputReferences.Any(x=>string.Equals(x.ItemSpec, assemblyRef.AssemblyName.Name, StringComparison.OrdinalIgnoreCase)))
                 {
                     Log.LogMessage("OpenWrap reference to '{0}' already added", assemblyRef.File.Path.FullPath);
                     continue;
