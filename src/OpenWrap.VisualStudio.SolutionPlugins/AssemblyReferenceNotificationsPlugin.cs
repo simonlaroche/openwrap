@@ -98,6 +98,8 @@ namespace OpenWrap.SolutionPlugins.VisualStudio
                         project = x,
                         scope = PathFinder.GetCurrentScope(descriptors[string.Empty].Value.DirectoryStructure, x.File.Path)
                     });
+
+            
             var resolvedAssemblies = (
                                          from project in projects
                                          where descriptors.ContainsKey(project.scope)

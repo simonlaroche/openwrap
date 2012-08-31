@@ -122,37 +122,72 @@ namespace OpenWrap.Resharper
         {
             if (_shuttingDown) return;
             _output.Write("Changes detected, updating assembly references ({0}).", GetHashCode());
-            foreach (var project in _solution.GetAllProjects())
+
+            bool first = true;
+            foreach (var project in _solution.GetAllProjectsRecursivly())
             {
-                if (project.ProjectFile == null) continue;
-                var projectPath = project.ProjectFile.Location.FullPath;
-                if (!_assemblyMap.ContainsKey(projectPath))
-                    continue;
-                var existingOpenWrapReferences = project.GetAssemblyReferences()
-                        .Where(x => x.GetProperty(ISWRAP) != null).ToList();
 
-                var existingOpenWrapReferencePaths = existingOpenWrapReferences
-                        .Select(assemblyRef => assemblyRef.HintLocation()).ToList();
-
-                var assemblies = _assemblyMap[projectPath];
-                foreach (var path in assemblies
-                        .Where(x => !existingOpenWrapReferencePaths.Contains(x)))
+                if(first)
                 {
-                    ResharperLogger.Debug("Adding reference {0} to {1}", projectPath, path);
-
-                    var assembly = project.AddAssemblyReference(path);
-                    assembly.SetProperty(ISWRAP, true);
+                    _output.Write("Assemblies in Assembly Map");
+                    
+                    foreach (var kvp in _assemblyMap)
+                    {
+                        _output.Write("\t" + kvp.Key);
+                        foreach (var value in kvp.Value)
+                        {
+                            _output.Write("\t\t" + value);
+                        }
+                    }
+                    first = false;
                 }
-                foreach (var toRemove in existingOpenWrapReferencePaths.Where(x => !assemblies.Contains(x)))
-                {
-                    string remove = toRemove;
-                    ResharperLogger.Debug("Removing reference {0} from {1}",
-                                          projectPath,
-                                          toRemove);
-                    project.RemoveAssemblyReference(existingOpenWrapReferences.First(x => x.HintLocation() == remove));
-                }
+                RefreshProject(project);
             }
         }
+
+
+
+        void RefreshProject(resharper::JetBrains.ProjectModel.IProject project)
+        {
+            if (project.ProjectFile == null) return;
+            var projectPath = project.ProjectFile.Location.FullPath;
+            _output.Write("Project files ({0}).", projectPath);
+            if (!_assemblyMap.ContainsKey(projectPath))
+            {
+                _output.Write("Project files ({0}) not in assembly map continuing.", projectPath);
+                return;
+            }
+            var existingOpenWrapReferences = project.GetAssemblyReferences()
+                .Where(x => x.GetProperty(ISWRAP) != null).ToList();
+
+            foreach (var projectToAssemblyReference in existingOpenWrapReferences)
+            {
+                _output.Write("Existing openwrap ref: {0} @ {1}. ", projectToAssemblyReference.Name, projectToAssemblyReference.HintLocation());
+            }
+
+            var existingOpenWrapReferencePaths = existingOpenWrapReferences
+                .Select(assemblyRef => assemblyRef.HintLocation()).ToList();
+
+            var assemblies = _assemblyMap[projectPath];
+            foreach (var path in assemblies
+                .Where(x => !existingOpenWrapReferencePaths.Contains(x)))
+            {
+                _output.Write("Adding reference {0} to {1}", projectPath, path);
+                ResharperLogger.Debug("Adding reference {0} to {1}", projectPath, path);
+
+                var assembly = project.AddAssemblyReference(path);
+                assembly.SetProperty(ISWRAP, true);
+            }
+            foreach (var toRemove in existingOpenWrapReferencePaths.Where(x => !assemblies.Contains(x)))
+            {
+                string remove = toRemove;
+                ResharperLogger.Debug("Removing reference {0} from {1}",
+                                      projectPath,
+                                      toRemove);
+                project.RemoveAssemblyReference(existingOpenWrapReferences.First(x => x.HintLocation() == remove));
+            }
+        }
+
         public void Dispose()
         {
             if (_shuttingDown) return;
@@ -206,4 +241,43 @@ namespace OpenWrap.Resharper
                    solutionChanges.IsClosingSolution;
         }
     }
+
+    public static class SolutionsExtensions
+    {
+        public static IEnumerable<resharper::JetBrains.ProjectModel.IProject> GetAllProjectsRecursivly(this resharper::JetBrains.ProjectModel.ISolution solution)
+        {
+            var allProjects = solution.GetAllProjects();
+            
+            var projects = Enumerable.Empty<resharper::JetBrains.ProjectModel.IProject>();
+            
+            foreach (var project in allProjects)
+            {
+                projects = projects.Concat(project.GetAllProjectsRecursivly());
+      
+            }
+            return projects;
+        }
+
+        static IEnumerable<resharper::JetBrains.ProjectModel.IProject> GetAllProjectsRecursivly(this resharper::JetBrains.ProjectModel.IProjectItem projectItem)
+        {
+            var p = projectItem as resharper::JetBrains.ProjectModel.IProject;
+            if(p == null) yield break;
+
+            foreach (var subItem in p.GetSubItems())
+            {
+                var allProjectsRecursivly = subItem.GetAllProjectsRecursivly();
+                foreach (var project in allProjectsRecursivly)
+                {
+                    yield return project;
+                }
+            }
+
+            yield return p;
+
+        }
+
+
+
+    }
+
 }

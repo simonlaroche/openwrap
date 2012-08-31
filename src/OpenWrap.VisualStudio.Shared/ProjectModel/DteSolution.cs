@@ -8,6 +8,8 @@ using OpenWrap.VisualStudio.SolutionAddIn;
 
 namespace OpenWrap.VisualStudio.ProjectModel
 {
+    using EnvDTE80;
+
     public class DteSolution : ISolution, IDisposable
     {
         Solution _solution;
@@ -20,13 +22,65 @@ namespace OpenWrap.VisualStudio.ProjectModel
         public DteSolution(Solution solution)
         {
             _solution = solution;
-            _projects = _solution.Projects.OfType<Project>().Select(x => new DteProject(x)).ToList();
+            _projects = GetProjects( _solution).Select(x => new DteProject(x)).ToList();
             _solutionEvents = _solution.DTE.Events.SolutionEvents;
             _solutionEvents.ProjectAdded += HandleProjectAdded;
             _solutionEvents.ProjectRemoved += HandleProjectRemoved;
             _solutionEvents.ProjectRenamed += HandleProjectRenamed;
             Version = new Version(solution.DTE.Version);
         }
+
+        static IEnumerable<Project> GetProjects(EnvDTE.Solution solution)
+        {
+            var projects = solution.Projects;
+            var list = new List<Project>();
+            var item = projects.GetEnumerator();
+            while (item.MoveNext())
+            {
+                var project = item.Current as Project;
+                if (project == null)
+                {
+                    continue;
+                }
+
+                if (project.Kind == ProjectKinds.vsProjectKindSolutionFolder)
+                {
+                    list.AddRange(GetSolutionFolderProjects(project));
+                }
+                else
+                {
+                    list.Add(project);
+                }
+            }
+
+            return list;
+        }
+
+        private static IEnumerable<Project> GetSolutionFolderProjects(Project solutionFolder)
+        {
+            var list = new List<Project>();
+            for (var i = 1; i <= solutionFolder.ProjectItems.Count; i++)
+            {
+                var subProject = solutionFolder.ProjectItems.Item(i).SubProject;
+                if (subProject == null)
+                {
+                    continue;
+                }
+
+                // If this is another solution folder, do a recursive call, otherwise add
+                if (subProject.Kind == ProjectKinds.vsProjectKindSolutionFolder)
+                {
+                list.AddRange(GetSolutionFolderProjects(subProject));
+                }
+                else
+                {
+                list.Add(subProject);
+                }
+            }
+
+            return list;
+        }
+
 
         void HandleProjectRenamed(Project project, string oldname)
         {
