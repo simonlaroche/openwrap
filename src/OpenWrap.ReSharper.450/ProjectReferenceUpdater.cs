@@ -123,24 +123,8 @@ namespace OpenWrap.Resharper
             if (_shuttingDown) return;
             _output.Write("Changes detected, updating assembly references ({0}).", GetHashCode());
 
-            bool first = true;
             foreach (var project in _solution.GetAllProjectsRecursivly())
             {
-
-                if(first)
-                {
-                    _output.Write("Assemblies in Assembly Map");
-                    
-                    foreach (var kvp in _assemblyMap)
-                    {
-                        _output.Write("\t" + kvp.Key);
-                        foreach (var value in kvp.Value)
-                        {
-                            _output.Write("\t\t" + value);
-                        }
-                    }
-                    first = false;
-                }
                 RefreshProject(project);
             }
         }
