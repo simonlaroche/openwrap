@@ -6,7 +6,7 @@ using EnvDTE;
 using EnvDTE80;
 using OpenWrap.VisualStudio;
 
-#if v600 || v610
+#if v600 || v610 || v710
 using ResharperPluginManager = resharper::JetBrains.Application.PluginSupport.PluginManager;
 using ResharperPlugin = resharper::JetBrains.Application.PluginSupport.Plugin;
 using ResharperPluginTitleAttribute = resharper::JetBrains.Application.PluginSupport.PluginTitleAttribute;
@@ -49,7 +49,7 @@ namespace OpenWrap.Resharper
         OpenWrapOutput _output;
         ResharperThreading _threading;
 
-#if v600 || v610
+#if v600 || v610 || v710
         resharper::JetBrains.VsIntegration.Application.JetVisualStudioHost _host;
         resharper::JetBrains.Application.PluginSupport.PluginsDirectory _pluginsDirectory;
         resharper::JetBrains.DataFlow.LifetimeDefinition _lifetimeDefinition;
@@ -63,9 +63,9 @@ namespace OpenWrap.Resharper
             _output = new OpenWrapOutput("Resharper Plugin Manager");
             _output.Write("Loaded ({0}).", GetType().Assembly.GetName().Version);
 
-#if !v600 && !v610
+#if !v600 && !v610 && !v710
             _threading = new LegacyShellThreading();
-#else       
+#else
             _host = resharper::JetBrains.VsIntegration.Application.JetVisualStudioHost.GetOrCreateHost((Microsoft.VisualStudio.OLE.Interop.IServiceProvider)_dte);
             var resolvedObj = _host.Environment.Container.ResolveDynamic(typeof(ResharperThreading));
             if (resolvedObj != null)
@@ -84,14 +84,19 @@ namespace OpenWrap.Resharper
         {
             _output.Write("Unloading.");
             //runTestRunner = false;
-#if !v600 && !v610
-            _selfPlugin.Enabled = false;
-            ResharperPluginManager.Instance.Plugins.Remove(_selfPlugin);
-#else
+#if v600 || v610
             _selfPlugin.IsEnabled.SetValue(false);
             _pluginsDirectory.Plugins.Remove(_selfPlugin);
             _lifetimeDefinition.Terminate();
             _host = null;
+#elif v710
+            _selfPlugin.IsEnabled.SetValue(false);
+            //_pluginsDirectory.Plugins.Remove(_selfPlugin);
+            _lifetimeDefinition.Terminate();
+            _host = null;
+#else
+            _selfPlugin.Enabled = false;
+            ResharperPluginManager.Instance.Plugins.Remove(_selfPlugin);
 #endif
             _selfPlugin = null;
         }
@@ -111,18 +116,28 @@ namespace OpenWrap.Resharper
                     (resharper::JetBrains.Application.PluginSupport.PluginsDirectory)_host.Environment.Container.ResolveDynamic(typeof(resharper::JetBrains.Application.PluginSupport.PluginsDirectory)).Instance;
 
                 _selfPlugin = new ResharperPlugin(_lifetimeDefinition.Lifetime, new[] { new resharper::JetBrains.Util.FileSystemPath(asm.Location) }, null, null, null);
-                
+
                 _pluginsDirectory.Plugins.Add(_selfPlugin);
                 
                 _selfPlugin.IsEnabled.SetValue(true);
+#elif v710
+                _lifetimeDefinition = resharper::JetBrains.DataFlow.Lifetimes.Define(resharper::JetBrains.DataFlow.EternalLifetime.Instance, "OpenWrap Solution");
+                _pluginsDirectory =
+                    (resharper::JetBrains.Application.PluginSupport.PluginsDirectory)_host.Environment.Container.ResolveDynamic(typeof(resharper::JetBrains.Application.PluginSupport.PluginsDirectory)).Instance;
+
+                _selfPlugin = new ResharperPlugin(_lifetimeDefinition.Lifetime, new[] { new resharper::JetBrains.Util.FileSystemPath(asm.Location) }, null, null, null);
+
+                //_pluginsDirectory.Plugins.Add(_selfPlugin);
+
+                _selfPlugin.IsEnabled.SetValue(true);
 #else
                 var id = "ReSharper OpenWrap Integration";
-            _selfPlugin = new ResharperPlugin(id, new[] { asm });
+                _selfPlugin = new ResharperPlugin(id, new[] { asm });
 
 
-            ResharperPluginManager.Instance.Plugins.Add(_selfPlugin);
-            _selfPlugin.Enabled = true;
-            resharper::JetBrains.Application.Shell.Instance.LoadAssemblies(id, asm);
+                ResharperPluginManager.Instance.Plugins.Add(_selfPlugin);
+                _selfPlugin.Enabled = true;
+                resharper::JetBrains.Application.Shell.Instance.LoadAssemblies(id, asm);
 #endif
             }
             catch (Exception e)

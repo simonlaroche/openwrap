@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 using EnvDTE;
 
-#if v600 || v610
+#if v600 || v610 || v710
 using ResharperPluginManager = resharper::JetBrains.Application.PluginSupport.PluginManager;
 using ResharperPlugin = resharper::JetBrains.Application.PluginSupport.Plugin;
 using ResharperPluginTitleAttribute = resharper::JetBrains.Application.PluginSupport.PluginTitleAttribute;
@@ -58,7 +58,7 @@ namespace OpenWrap.Resharper
                           {
 #if v450
                               var action = _actionManager.GetAction(PluginManager.ACTION_REANALYZE);
-#elif !v600 && !v610
+#elif !v600 && !v610 && !v710
                               var action = _actionManager.GetUpdatableAction(PluginManager.ACTION_REANALYZE);
 #else
                               var action = _actionManager.TryGetAction(PluginManager.ACTION_REANALYZE);
@@ -89,7 +89,7 @@ namespace OpenWrap.Resharper
 #if v450 || v500 || v510 || v600
             var sas = resharper::JetBrains.ReSharper.Daemon.Impl.SolutionAnalysisService.GetInstance(_solution);
             sas.AnalysisEnabledOption = true;
-#elif v610
+#elif v610 || v710
 #pragma warning disable 612,618
             resharper::JetBrains.Application.Shell.Instance.Invocator.ReentrancyGuard.Execute("SWEA", () =>
             {

@@ -118,6 +118,11 @@
       <Name>OpenWrap.Resharper.610</Name>
       <Aliases>r61</Aliases>
     </ProjectReference>
+    <ProjectReference Include="..\OpenWrap.Resharper.710\OpenWrap.Resharper.710.csproj">
+      <Project>{2657f67f-d89f-4458-a0b0-e05147d14c48}</Project>
+      <Name>OpenWrap.Resharper.710</Name>
+      <Aliases>r71</Aliases>
+    </ProjectReference>
     <ProjectReference Include="..\OpenWrap.VisualStudio.SolutionAddIn\OpenWrap.VisualStudio.SolutionAddIn.csproj">
       <Project>{FB5A5815-E2C6-4FDB-8BA4-26192CB06ECC}</Project>
       <Name>OpenWrap.VisualStudio.SolutionAddIn</Name>

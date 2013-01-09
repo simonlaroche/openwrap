@@ -30,7 +30,8 @@ namespace OpenWrap.VisualStudio
           new List<string>
         {
           "!VisualStudio.DTE.9.0:{0}",
-          "!VisualStudio.DTE.10.0:{0}"
+          "!VisualStudio.DTE.10.0:{0}",
+          "!VisualStudio.DTE.11.0:{0}",
         };
 
         // --------------------------------------------------------------------------------------------
