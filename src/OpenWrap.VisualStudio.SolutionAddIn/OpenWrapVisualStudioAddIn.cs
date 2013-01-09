@@ -59,6 +59,8 @@ namespace OpenWrap.VisualStudio.SolutionAddIn
                         dte.Solution.AddIns.Add(ComConstants.ADD_IN_PROGID_2008, ComConstants.ADD_IN_DESCRIPTION, ComConstants.ADD_IN_NAME, true);
                     else if (dte.Version == "10.0")
                         dte.Solution.AddIns.Add(ComConstants.ADD_IN_PROGID_2010, ComConstants.ADD_IN_DESCRIPTION, ComConstants.ADD_IN_NAME, true);
+                    else if (dte.Version == "11.0")
+                        dte.Solution.AddIns.Add(ComConstants.ADD_IN_PROGID_2012, ComConstants.ADD_IN_DESCRIPTION, ComConstants.ADD_IN_NAME, true);
                     return;
                 }
                 _rootPath = GetRootLocation(dte.Solution.FullName);

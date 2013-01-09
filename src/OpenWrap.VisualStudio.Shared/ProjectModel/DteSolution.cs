@@ -127,7 +127,7 @@ namespace OpenWrap.VisualStudio.ProjectModel
             {
                 CheckAccess();
                 _solution.AddIns.Update();
-                return _solution.AddIns.OfType<AddIn>().Any(x => x.ProgID == ComConstants.ADD_IN_PROGID_2010 || x.ProgID == ComConstants.ADD_IN_PROGID_2008);
+                return _solution.AddIns.OfType<AddIn>().Any(x => x.ProgID == ComConstants.ADD_IN_PROGID_2012 || x.ProgID == ComConstants.ADD_IN_PROGID_2010 || x.ProgID == ComConstants.ADD_IN_PROGID_2008);
             }
             set
             {
@@ -138,12 +138,13 @@ namespace OpenWrap.VisualStudio.ProjectModel
                         _solution.AddIns.Add(ComConstants.ADD_IN_PROGID_2008, ComConstants.ADD_IN_DESCRIPTION, ComConstants.ADD_IN_NAME, true);
                     else if (_solution.DTE.Version == "10.0")
                         _solution.AddIns.Add(ComConstants.ADD_IN_PROGID_2010, ComConstants.ADD_IN_DESCRIPTION, ComConstants.ADD_IN_NAME, true);
+                    else if (_solution.DTE.Version == "11.0")
+                        _solution.AddIns.Add(ComConstants.ADD_IN_PROGID_2012, ComConstants.ADD_IN_DESCRIPTION, ComConstants.ADD_IN_NAME, true);
                 }
                 else if (value == false && OpenWrapAddInEnabled)
                 {
                     _solution.AddIns.Cast<AddIn>()
-                        .Where(x => x.ProgID == ComConstants.ADD_IN_PROGID_2008 ||
-                                    x.ProgID == ComConstants.ADD_IN_PROGID_2010)
+                        .Where(x => x.ProgID == ComConstants.ADD_IN_PROGID_2008 || x.ProgID == ComConstants.ADD_IN_PROGID_2010 || x.ProgID == ComConstants.ADD_IN_PROGID_2012)
                         .ToList().ForEach(x => x.Remove());
                 }
             }

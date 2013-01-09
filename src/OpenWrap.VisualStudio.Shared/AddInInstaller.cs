@@ -10,11 +10,13 @@ namespace OpenWrap.VisualStudio
         {
             RegisterComAddIn<OpenWrapVisualStudioAddIn2008>(PerUserComComponentInstaller.ClrVersion2, assemblySource);
             RegisterComAddIn<OpenWrapVisualStudioAddIn2010>(PerUserComComponentInstaller.ClrVersion4, assemblySource);
+            RegisterComAddIn<OpenWrapVisualStudioAddIn2012>(PerUserComComponentInstaller.ClrVersion4, assemblySource);
         }
         public static void Uninstall()
         {
             UnregisterComAddIn<OpenWrapVisualStudioAddIn2008>();
             UnregisterComAddIn<OpenWrapVisualStudioAddIn2010>();
+            UnregisterComAddIn<OpenWrapVisualStudioAddIn2012>();
         }
 
         static void UnregisterComAddIn<T>(string assemblySource = null)

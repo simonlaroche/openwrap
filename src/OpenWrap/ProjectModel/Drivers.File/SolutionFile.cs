@@ -52,8 +52,8 @@ namespace OpenWrap.ProjectModel.Drivers.File
         public bool OpenWrapAddInEnabled
         {
             get
-            { 
-                string progId = Version.Major == 10 ? SolutionConstants.ADD_IN_PROGID_2010 : SolutionConstants.ADD_IN_PROGID_2008;
+            {
+                string progId = Version.Major == 10 ? SolutionConstants.ADD_IN_PROGID_2010 : Version.Major == 11 ? SolutionConstants.ADD_IN_PROGID_2012 : SolutionConstants.ADD_IN_PROGID_2008;
                 var global = _content.OfType<Global>().FirstOrDefault();
                 if (global == null) return false;
                 var addinSection = global.Sections.OfType<ExtensibilityAddInsGlobalSection>().FirstOrDefault();
@@ -62,7 +62,7 @@ namespace OpenWrap.ProjectModel.Drivers.File
             }
             set
             {
-                string progId = Version.Major == 10 ? SolutionConstants.ADD_IN_PROGID_2010 : SolutionConstants.ADD_IN_PROGID_2008;
+                string progId = Version.Major == 10 ? SolutionConstants.ADD_IN_PROGID_2010 : Version.Major == 11 ? SolutionConstants.ADD_IN_PROGID_2012 : SolutionConstants.ADD_IN_PROGID_2008;
                 if (value == false && !OpenWrapAddInEnabled) return;
                 if (value == false)
                 {

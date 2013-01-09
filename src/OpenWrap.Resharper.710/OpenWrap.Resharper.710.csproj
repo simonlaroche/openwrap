@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{2657F67F-D89F-4458-A0B0-E05147D14C48}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OpenWrap.Resharper._710</RootNamespace>
+    <AssemblyName>OpenWrap.Resharper.710</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\scratch\bin\OpenWrap.Resharper.710-Debug-AnyCPU\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;v710;__OW_PLATFORM_AnyCPU__;__OW_PROFILE_net35__;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>1591</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\lib\vs2008\EnvDTE.dll</HintPath>
+    </Reference>
+    <Reference Include="envdte80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\lib\vs2008\envdte80.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.Platform.ReSharper.ComponentModel">
+      <HintPath>..\..\lib\resharper-7.1.0\JetBrains.Platform.ReSharper.ComponentModel.dll</HintPath>
+      <Aliases>resharper</Aliases>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="JetBrains.Platform.ReSharper.Metadata">
+      <HintPath>..\..\lib\resharper-7.1.0\JetBrains.Platform.ReSharper.Metadata.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="JetBrains.Platform.ReSharper.ProjectModel">
+      <HintPath>..\..\lib\resharper-7.1.0\JetBrains.Platform.ReSharper.ProjectModel.dll</HintPath>
+      <Aliases>resharper</Aliases>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="JetBrains.Platform.ReSharper.Shell">
+      <HintPath>..\..\lib\resharper-7.1.0\JetBrains.Platform.ReSharper.Shell.dll</HintPath>
+      <Aliases>resharper</Aliases>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="JetBrains.Platform.ReSharper.UI">
+      <HintPath>..\..\lib\resharper-7.1.0\JetBrains.Platform.ReSharper.UI.dll</HintPath>
+      <Aliases>resharper</Aliases>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="JetBrains.Platform.ReSharper.Util">
+      <HintPath>..\..\lib\resharper-7.1.0\JetBrains.Platform.ReSharper.Util.dll</HintPath>
+      <Aliases>resharper</Aliases>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="JetBrains.Platform.ReSharper.VisualStudio.Core">
+      <HintPath>..\..\lib\resharper-7.1.0\JetBrains.Platform.ReSharper.VisualStudio.Core.dll</HintPath>
+      <Aliases>resharper</Aliases>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="JetBrains.ReSharper.Daemon">
+      <HintPath>..\..\lib\resharper-7.1.0\JetBrains.ReSharper.Daemon.dll</HintPath>
+      <Aliases>resharper</Aliases>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="JetBrains.ReSharper.Resources">
+      <HintPath>..\..\lib\resharper-7.1.0\JetBrains.ReSharper.Resources.dll</HintPath>
+      <Aliases>resharper</Aliases>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="JetBrains.ReSharper.SolutionAnalysis">
+      <HintPath>..\..\lib\resharper-7.1.0\JetBrains.ReSharper.SolutionAnalysis.dll</HintPath>
+      <Aliases>resharper</Aliases>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.OLE.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\vs2008\Microsoft.VisualStudio.OLE.Interop.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shell, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\vs2008\Microsoft.VisualStudio.Shell.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\OpenWrap.ReSharper.450\DteExtensions.cs">
+      <Link>DteExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenWrap.ReSharper.450\Guard.cs">
+      <Link>Guard.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenWrap.ReSharper.450\IResharperTests.cs">
+      <Link>IResharperTests.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenWrap.ReSharper.450\OpenWrapOutput.cs">
+      <Link>OpenWrapOutput.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenWrap.ReSharper.450\PluginManager.cs">
+      <Link>PluginManager.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenWrap.ReSharper.450\ProjectReferenceUpdater.cs">
+      <Link>ProjectReferenceUpdater.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenWrap.ReSharper.450\ResharperLogger.cs">
+      <Link>ResharperLogger.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenWrap.ReSharper.450\ResharperTests5.cs">
+      <Link>ResharperTests5.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenWrap.ReSharper.450\TestRunner.cs">
+      <Link>TestRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\OpenWrap.VisualStudio.Shared\SiteManager.cs">
+      <Link>SiteManager.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
