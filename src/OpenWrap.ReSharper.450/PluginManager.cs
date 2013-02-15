@@ -1,6 +1,7 @@
 extern alias resharper;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using EnvDTE;
 using EnvDTE80;
@@ -29,7 +30,6 @@ using ResharperAssemblyReference = resharper::JetBrains.ProjectModel.IAssemblyRe
 [assembly: ResharperPluginTitleAttribute("OpenWrap ReSharper Integration")]
 [assembly: ResharperPluginDescription("Provides integration of OpenWrap features within ReSharper.")]
 [assembly: ResharperPluginVendorAttribute("Caffeine IT")]
-
 namespace OpenWrap.Resharper
 {
     /// <summary>
@@ -63,13 +63,21 @@ namespace OpenWrap.Resharper
             _output = new OpenWrapOutput("Resharper Plugin Manager");
             _output.Write("Loaded ({0}).", GetType().Assembly.GetName().Version);
 
-#if !v600 && !v610 && !v710
-            _threading = new LegacyShellThreading();
-#else
+#if v600 || v610
+
             _host = resharper::JetBrains.VsIntegration.Application.JetVisualStudioHost.GetOrCreateHost((Microsoft.VisualStudio.OLE.Interop.IServiceProvider)_dte);
+           
             var resolvedObj = _host.Environment.Container.ResolveDynamic(typeof(ResharperThreading));
             if (resolvedObj != null)
                 _threading = (ResharperThreading)resolvedObj.Instance;
+#elif v710
+            _host = resharper::JetBrains.VsIntegration.Application.JetVisualStudioHost.GetOrCreateHost((Microsoft.VisualStudio.OLE.Interop.IServiceProvider)_dte);
+           
+            var resolvedObj = _host.Environment.Container.ResolveDynamic(typeof(ResharperThreading));
+            if (resolvedObj != null)
+                _threading = (ResharperThreading)resolvedObj.Instance;
+#else
+             _threading = new LegacyShellThreading();
 #endif
             if (_threading == null)
             {
@@ -90,7 +98,7 @@ namespace OpenWrap.Resharper
             _lifetimeDefinition.Terminate();
             _host = null;
 #elif v710
-            _selfPlugin.IsEnabled.SetValue(false);
+            
             //_pluginsDirectory.Plugins.Remove(_selfPlugin);
             _lifetimeDefinition.Terminate();
             _host = null;
@@ -122,14 +130,48 @@ namespace OpenWrap.Resharper
                 _selfPlugin.IsEnabled.SetValue(true);
 #elif v710
                 _lifetimeDefinition = resharper::JetBrains.DataFlow.Lifetimes.Define(resharper::JetBrains.DataFlow.EternalLifetime.Instance, "OpenWrap Solution");
+
+                //            var asm = GetType().Assembly;
+                //            var pluginSource = new CollectPluginsOpenWrapCacheFolder(_lifetimeDefinition.Lifetime);
+
+                var container = new resharper::JetBrains.Application.Components.ComponentContainer(_lifetimeDefinition.Lifetime, "Openwrap container");
+                container.Inject<CollectPluginsOpenWrapCacheFolder>();
+
+                _host.Environment.Container.ChainTo(container);
+                _output.Write("Injected plugin source in container.");
+                var instance = _host.Environment.Container.ResolveDynamic(typeof(IEnumerable<resharper::JetBrains.Application.PluginSupport.IPluginSource>)).Instance;
+                _output.Write("Resolving IPlugInSource returns {0}.", instance.GetType());
+                var enumemerable = instance as IEnumerable<resharper::JetBrains.Application.PluginSupport   .IPluginSource>;
+                if (enumemerable != null)
+                {
+                    foreach (var source in enumemerable)
+                    {
+                        _output.Write("IPlugInSource {0}.", source.GetType());
+                    }
+                }
+
+                var pluginDefinition = (resharper::JetBrains.Application.PluginSupport.IPluginSource)_host.Environment.Container.ResolveDynamic(typeof(CollectPluginsOpenWrapCacheFolder)).Instance;
+                var pi =pluginDefinition.DiscoverPluginSourceInfo().First().Plugins.First();
+                pi.IsEnabled.SetValue(true);
                 _pluginsDirectory =
                     (resharper::JetBrains.Application.PluginSupport.PluginsDirectory)_host.Environment.Container.ResolveDynamic(typeof(resharper::JetBrains.Application.PluginSupport.PluginsDirectory)).Instance;
 
-                _selfPlugin = new ResharperPlugin(_lifetimeDefinition.Lifetime, new[] { new resharper::JetBrains.Util.FileSystemPath(asm.Location) }, null, null, null);
+                var type = typeof(resharper::JetBrains.Application.PluginSupport.PluginsDirectory);
+                var fieldInfo = type.GetField("myPlugins", BindingFlags.Instance | BindingFlags.NonPublic);
+                var value = (List<ResharperPlugin>)fieldInfo.GetValue(_pluginsDirectory);
 
-                //_pluginsDirectory.Plugins.Add(_selfPlugin);
+                _output.Write("{0} plugin registered.", value.Count());
 
-                _selfPlugin.IsEnabled.SetValue(true);
+
+                value.Add(pi);
+
+//                _output.Write("{0} Plugins in plug in directory", _pluginsDirectory.Plugins.Count());
+//
+//                    foreach (var plugin in _pluginsDirectory.Plugins)
+//                    {
+//                        _output.Write("PlugIn {0}.", plugin.AssemblyPaths.First().FullPath);
+//                    }
+
 #else
                 var id = "ReSharper OpenWrap Integration";
                 _selfPlugin = new ResharperPlugin(id, new[] { asm });

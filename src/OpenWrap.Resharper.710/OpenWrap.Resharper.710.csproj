@@ -132,6 +132,7 @@
     <Compile Include="..\OpenWrap.VisualStudio.Shared\SiteManager.cs">
       <Link>SiteManager.cs</Link>
     </Compile>
+    <Compile Include="OpenWrapCachePlugInSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

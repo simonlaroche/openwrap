@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{20503E9F-CA3D-496B-8842-B1FE7D39B1E7}"
 	ProjectSection(SolutionItems) = preProject
 		..\openwrap.tests.wrapdesc = ..\openwrap.tests.wrapdesc
@@ -142,5 +142,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{42F90C40-827D-4CF6-B206-EB2315AACDDB} = {41450CC7-8984-4460-B15A-EB4274347FB5}
 		{4E23A829-B9EF-4BDE-941A-D15B334C09AD} = {41450CC7-8984-4460-B15A-EB4274347FB5}
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+		OpenWrap.VisualStudioIntegration2010 = 1;Ensures OpenWrap initialization when a solution is opened.;OpenWrap Visual Studio Solution Add-in
 	EndGlobalSection
 EndGlobal
