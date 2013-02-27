@@ -145,7 +145,7 @@
     </CreateItem>
 
     <!-- Code Contracts reference assemblies  -->
-    <CreateItem Include="@(ContractReferenceAssemblies)" AdditionalMetadata="TargetPath=%(ContractReferenceAssemblies.TargetPath)">
+    <CreateItem Include="@(ContractReferenceAssemblies)" AdditionalMetadata="TargetPath=CodeContracts\%(ContractReferenceAssemblies.FileName)%(ContractReferenceAssemblies.Extension)">
       <Output TaskParameter="Include" ItemName="_OpenWrap-CurrentBuildOutput"/>
     </CreateItem>
 
@@ -185,10 +185,10 @@
     </CreateItem>
 
     <CreateItem Include="@(Content)" Condition="'%(Content.FromOpenWrap)' != 'True'"
-                AdditionalMetadata="TargetPath=%(Content.Link)">
+                AdditionalMetadata="TargetPath=%(Content.Identity)">
       <Output TaskParameter="Include" ItemName="_OpenWrap-FilteredContent"/>
-    </CreateItem> 
-    
+    </CreateItem>
+
     <!--<ItemGroup>
       --><!-- Binary result (.exe or .dll) --><!--
       --><!--<_OpenWrap-CurrentBuildOutput Include="@(IntermediateAssembly)">

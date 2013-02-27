@@ -65,7 +65,7 @@ namespace OpenWrap.Build.Tasks
             return true;
         }
 
-        static ILookup<string, string> Files(IEnumerable<ITaskItem> specs)
+         ILookup<string, string> Files(IEnumerable<ITaskItem> specs)
         {
             return specs == null
                        ? Lookup<string, string>.Empty
@@ -74,9 +74,13 @@ namespace OpenWrap.Build.Tasks
                              .ToLookup(_ => _.target, _ => _.path);
         }
 
-        static string GetTarget(ITaskItem x)
+        string GetTarget(ITaskItem x)
         {
             var target = x.GetMetadata("TargetPath");
+
+            WriteLow(string.Format("TargetPath: {0} Path: {1}", target, x.ItemSpec));
+            
+            
             if (Path.GetFileName(x.ItemSpec) == Path.GetFileName(target))
                 target = Path.GetDirectoryName(target);
             return target;
